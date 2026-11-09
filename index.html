@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Science Fair Idea Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&display=swap">
+<style>
+/* Layout: a bright lab bench. Topic tiles across the top, project cards below, a pop-up card for materials. */
+:root {
+  --bg: #f4f6ff;
+  --bg-dots: #dfe4fb;
+  --panel: #ffffff;
+  --ink: #1d1f3b;
+  --ink-soft: #565a7d;
+  --line: #d9dcf0;
+  --shadow: 0 3px 0 #c9cde8;
+  --display: "Fredoka", "Trebuchet MS", system-ui, sans-serif;
+  --body: "Nunito", "Segoe UI", system-ui, sans-serif;
+
+  --plants: #2fb35a;  --animals: #ff8a1f; --body-c: #ff4f8b; --kitchen: #9b5cff; --weather: #1e9bff;
+  --motion: #ff4747;  --electric: #f5b800; --light: #10b8a6;  --earth: #8a5a3c;   --build: #4a63ff;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #15172b; --bg-dots: #1f2240; --panel: #20233f; --ink: #f3f4ff; --ink-soft: #b5b8db;
+    --line: #34385e; --shadow: 0 3px 0 #0c0d1c; --earth: #c48a62; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #15172b; --bg-dots: #1f2240; --panel: #20233f; --ink: #f3f4ff; --ink-soft: #b5b8db;
+  --line: #34385e; --shadow: 0 3px 0 #0c0d1c; --earth: #c48a62; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background-color: var(--bg);
+  background-image: radial-gradient(var(--bg-dots) 1.5px, transparent 1.5px);
+  background-size: 22px 22px;
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 18px;
+  line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 48px;
+}
+.wrap { max-width: 1240px; margin: 0 auto; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible { outline: 4px solid var(--weather); outline-offset: 3px; }
+
+/* Header */
+header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding-block: 28px 8px; }
+.brand { display: flex; align-items: center; gap: 14px; }
+.flask { width: 64px; height: 64px; flex: none; }
+h1 { font-family: var(--display); font-weight: 700; font-size: clamp(2rem, 4.5vw, 3.1rem); line-height: 1.05; margin: 0; letter-spacing: -0.5px; text-wrap: balance; }
+h1 .c1 { color: var(--motion); } h1 .c2 { color: var(--electric); } h1 .c3 { color: var(--plants); } h1 .c4 { color: var(--weather); } h1 .c5 { color: var(--kitchen); }
+.tag { color: var(--ink-soft); font-weight: 700; margin: 4px 0 0; }
+.tools { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn {
+  border: 3px solid var(--ink); background: var(--panel); border-radius: 999px; padding: 8px 18px;
+  font-family: var(--display); font-weight: 600; font-size: 1.05rem; box-shadow: 0 4px 0 var(--ink);
+  transition: transform .1s, box-shadow .1s;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 var(--ink); }
+.btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink); }
+.btn.surprise { background: var(--electric); color: #1d1f3b; }
+.btn.saved-on { background: var(--body-c); color: #fff; }
+
+/* Step labels */
+.step { font-family: var(--display); font-weight: 600; font-size: 1.35rem; margin: 26px 0 12px; display: flex; align-items: center; gap: 10px; }
+.step b { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--ink); color: var(--bg); font-size: 1.1rem; }
+.step small { font-family: var(--body); font-size: .95rem; color: var(--ink-soft); font-weight: 700; }
+
+/* Topic tiles */
+.topics { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; }
+.topic {
+  --c: var(--ink);
+  position: relative; text-align: left; border: 3px solid var(--c); background: var(--panel);
+  border-radius: 22px; padding: 14px 16px 14px; display: flex; align-items: center; gap: 12px;
+  box-shadow: 0 5px 0 var(--c); transition: transform .12s, box-shadow .12s, background .12s;
+}
+.topic:hover { transform: translateY(-3px); box-shadow: 0 8px 0 var(--c); }
+.topic .ico { font-size: 2.1rem; line-height: 1; width: 52px; height: 52px; display: grid; place-items: center; border-radius: 16px; background: color-mix(in srgb, var(--c) 18%, transparent); flex: none; }
+.topic .nm { font-family: var(--display); font-weight: 600; font-size: 1.12rem; line-height: 1.15; }
+.topic .ct { display: block; font-size: .85rem; color: var(--ink-soft); font-weight: 700; margin-top: 2px; }
+.topic[aria-pressed="true"] { background: var(--c); color: #fff; }
+.topic[aria-pressed="true"] .ct { color: #fff; opacity: .9; }
+.topic[aria-pressed="true"] .ico { background: rgba(255,255,255,.25); }
+.topic[aria-pressed="true"]::after {
+  content: "✓"; position: absolute; top: -10px; right: -10px; width: 30px; height: 30px; border-radius: 50%;
+  background: var(--panel); color: var(--c); border: 3px solid var(--c); display: grid; place-items: center; font-weight: 800; font-size: 1rem;
+}
+
+/* Filter bar */
+.bar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 18px; }
+.search { flex: 1 1 260px; position: relative; min-width: 0; }
+.search input {
+  width: 100%; border: 3px solid var(--line); background: var(--panel); border-radius: 999px;
+  padding: 10px 18px 10px 46px; font: inherit; color: var(--ink);
+}
+.search svg { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: var(--ink-soft); }
+.levels { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { border: 3px solid var(--line); background: var(--panel); border-radius: 999px; padding: 6px 14px; font-weight: 800; font-size: .95rem; }
+.chip[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: var(--bg); }
+.count { font-weight: 800; color: var(--ink-soft); margin: 14px 0 0; }
+.clear { background: none; border: none; text-decoration: underline; font-weight: 800; color: var(--weather); padding: 0 4px; }
+
+/* Project cards */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 18px; margin-top: 14px; }
+.card {
+  --c: var(--ink);
+  text-align: left; background: var(--panel); border: 3px solid var(--line); border-radius: 20px;
+  padding: 0; overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--shadow);
+  transition: transform .12s, border-color .12s;
+}
+.card:hover { transform: translateY(-4px) rotate(-.4deg); border-color: var(--c); }
+.card .top { background: var(--c); color: #fff; padding: 8px 14px; display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: .85rem; letter-spacing: .4px; text-transform: uppercase; }
+.card .inner { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.card h3 { font-family: var(--display); font-weight: 600; font-size: 1.3rem; line-height: 1.2; margin: 0; text-wrap: balance; }
+.card p { margin: 0; color: var(--ink-soft); font-size: 1rem; }
+.card .meta { margin-top: auto; padding-top: 6px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.pill { font-size: .82rem; font-weight: 800; border-radius: 999px; padding: 3px 10px; background: var(--bg); border: 2px solid var(--line); }
+.lv1 { color: #16833c; border-color: #9fe0b4; } .lv2 { color: #b26200; border-color: #ffd29c; } .lv3 { color: #c42357; border-color: #ffb3cb; }
+:root[data-theme="dark"] .lv1, :root[data-theme="dark"] .lv2, :root[data-theme="dark"] .lv3 { color: var(--ink); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .lv1, :root:not([data-theme="light"]) .lv2, :root:not([data-theme="light"]) .lv3 { color: var(--ink); } }
+.star { margin-left: auto; color: var(--body-c); font-size: 1.2rem; }
+.empty { text-align: center; padding: 40px 16px; font-family: var(--display); font-size: 1.3rem; color: var(--ink-soft); }
+
+/* Detail pop-up */
+.overlay { position: fixed; inset: 0; background: rgba(15, 17, 40, .55); display: grid; place-items: center; padding: 20px max(16px, env(safe-area-inset-right, 0px)) 20px max(16px, env(safe-area-inset-left, 0px)); z-index: 50; }
+.sheet {
+  --c: var(--ink);
+  background: var(--panel); border: 4px solid var(--c); border-radius: 28px; width: min(760px, 100%);
+  max-height: calc(100% - 20px); overflow: auto; box-shadow: 0 10px 0 var(--c); animation: pop .22s ease-out;
+}
+@keyframes pop { from { transform: scale(.94); opacity: .4; } to { transform: none; opacity: 1; } }
+.sheet .head { background: var(--c); color: #fff; padding: 18px 22px 20px; position: relative; }
+.sheet .kicker { font-weight: 800; text-transform: uppercase; letter-spacing: .6px; font-size: .85rem; opacity: .95; }
+.sheet h2 { font-family: var(--display); font-weight: 700; font-size: clamp(1.7rem, 4vw, 2.4rem); line-height: 1.1; margin: 4px 50px 0 0; text-wrap: balance; }
+.x { position: absolute; top: 14px; right: 14px; width: 44px; height: 44px; border-radius: 50%; border: 3px solid #fff; background: rgba(255,255,255,.2); color: #fff; font-size: 1.4rem; font-weight: 800; line-height: 1; }
+.sheet .body { padding: 20px 22px 24px; display: grid; gap: 18px; }
+.idea { font-size: 1.2rem; font-weight: 700; margin: 0; max-width: 62ch; }
+.facts { display: flex; flex-wrap: wrap; gap: 10px; }
+.fact { border: 3px solid var(--line); border-radius: 16px; padding: 8px 14px; }
+.fact span { display: block; font-size: .78rem; text-transform: uppercase; letter-spacing: .6px; font-weight: 800; color: var(--ink-soft); }
+.fact strong { font-family: var(--display); font-weight: 600; font-size: 1.15rem; }
+.reveal {
+  border: 3px dashed var(--c); background: color-mix(in srgb, var(--c) 10%, var(--panel)); border-radius: 18px;
+  padding: 16px; font-family: var(--display); font-weight: 600; font-size: 1.25rem; width: 100%;
+}
+.reveal:hover { background: color-mix(in srgb, var(--c) 20%, var(--panel)); }
+.box { border: 3px solid var(--line); border-radius: 20px; padding: 14px 18px; }
+.box h4 { font-family: var(--display); font-weight: 600; font-size: 1.2rem; margin: 0 0 8px; }
+.mats { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px 18px; }
+.mats label { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; font-weight: 700; }
+.mats input { width: 22px; height: 22px; margin-top: 2px; accent-color: var(--c); flex: none; }
+.mats input:checked + span { text-decoration: line-through; color: var(--ink-soft); }
+.note { font-size: .95rem; color: var(--ink-soft); margin: 8px 0 0; }
+.safety { border-color: #ffb3b3; background: color-mix(in srgb, #ff4747 8%, var(--panel)); }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; }
+
+@media (max-width: 480px) {
+  body { font-size: 17px; }
+  .topics { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .topic { flex-direction: column; align-items: flex-start; gap: 6px; padding: 12px; }
+  .topic .ico { width: 44px; height: 44px; font-size: 1.7rem; }
+  .topic .nm { font-size: 1rem; }
+  .grid { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <svg class="flask" viewBox="0 0 64 64" aria-hidden="true">
+        <path d="M24 6h16v4h-3v14l15 26a6 6 0 0 1-5 9H17a6 6 0 0 1-5-9l15-26V10h-3z" fill="var(--panel)" stroke="var(--ink)" stroke-width="3.5" stroke-linejoin="round"/>
+        <path d="M17.5 40h29l5 9a3 3 0 0 1-2.6 4.5H15.1a3 3 0 0 1-2.6-4.5z" fill="var(--kitchen)"/>
+        <circle cx="26" cy="47" r="3" fill="#fff" opacity=".8"/><circle cx="36" cy="44" r="2" fill="#fff" opacity=".8"/>
+        <circle cx="44" cy="20" r="3.5" fill="var(--electric)"/><circle cx="50" cy="10" r="2.5" fill="var(--body-c)"/>
+      </svg>
+      <div>
+        <h1><span class="c1">Science</span> <span class="c2">Fair</span> <span class="c3">Idea</span> <span class="c4">Lab</span></h1>
+        <p class="tag">250 project ideas for 4th and 5th grade scientists</p>
+      </div>
+    </div>
+    <div class="tools">
+      <button class="btn surprise" id="surprise" type="button">🎲 Surprise me</button>
+      <button class="btn" id="savedBtn" type="button" aria-pressed="false">★ My picks <span id="savedCount">0</span></button>
+    </div>
+  </header>
+
+  <div class="step"><b>1</b> Pick topics you like <small>Choose as many as you want</small></div>
+  <div class="topics" id="topics"></div>
+
+  <div class="step"><b>2</b> Look through the projects <small>Tap one to see what you'll need</small></div>
+  <div class="bar">
+    <label class="search" for="q">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="Search: magnets, ice, plants, balls..." autocomplete="off">
+    </label>
+    <div class="levels" id="levels" role="group" aria-label="Difficulty">
+      <button class="chip" type="button" data-lv="1" aria-pressed="false">Easy</button>
+      <button class="chip" type="button" data-lv="2" aria-pressed="false">Medium</button>
+      <button class="chip" type="button" data-lv="3" aria-pressed="false">Challenge</button>
+    </div>
+  </div>
+  <p class="count" id="count" aria-live="polite"></p>
+  <div class="grid" id="grid"></div>
+</div>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="dTitle"></div>
+</div>
+
+<script>
+const TOPICS = [
+  { id: "plants",   name: "Plants & Seeds",        icon: "🌱", color: "var(--plants)" },
+  { id: "animals",  name: "Animals & Bugs",        icon: "🐞", color: "var(--animals)" },
+  { id: "body",     name: "Human Body",            icon: "🫀", color: "var(--body-c)" },
+  { id: "kitchen",  name: "Kitchen Chemistry",     icon: "🧪", color: "var(--kitchen)" },
+  { id: "weather",  name: "Water & Weather",       icon: "🌧️", color: "var(--weather)" },
+  { id: "motion",   name: "Forces & Motion",       icon: "🚀", color: "var(--motion)" },
+  { id: "electric", name: "Magnets & Electricity", icon: "🧲", color: "var(--electric)" },
+  { id: "light",    name: "Light & Sound",         icon: "🔦", color: "var(--light)" },
+  { id: "earth",    name: "Earth & Space",         icon: "🌎", color: "var(--earth)" },
+  { id: "build",    name: "Build It!",             icon: "🛠️", color: "var(--build)" }
+];
+const TOPIC = Object.fromEntries(TOPICS.map(t => [t.id, t]));
+const PROJECTS = [];
+function addProjects(topic, list) {
+  list.forEach((p, i) => PROJECTS.push({ ...p, topic, id: topic + "-" + (i + 1) }));
+}
+</script>
+<script src="data/p1-plants-animals.js"></script>
+<script src="data/p2-body-kitchen.js"></script>
+<script src="data/p3-weather-motion.js"></script>
+<script src="data/p4-electric-light.js"></script>
+<script src="data/p5-earth-build.js"></script>
+<script>
+const LEVEL = { 1: "Easy", 2: "Medium", 3: "Challenge" };
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+};
+const state = {
+  topics: new Set(store.get("sfi-topics", [])),
+  levels: new Set(),
+  q: "",
+  savedOnly: false,
+  saved: new Set(store.get("sfi-saved", [])),
+  checks: store.get("sfi-checks", {})
+};
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+function renderTopics() {
+  $("#topics").innerHTML = TOPICS.map(t => {
+    const n = PROJECTS.filter(p => p.topic === t.id).length;
+    return `<button class="topic" type="button" data-topic="${t.id}" style="--c:${t.color}" aria-pressed="${state.topics.has(t.id)}">
+      <span class="ico" aria-hidden="true">${t.icon}</span>
+      <span><span class="nm">${t.name}</span><span class="ct">${n} projects</span></span></button>`;
+  }).join("");
+}
+
+function filtered() {
+  const q = state.q.trim().toLowerCase();
+  return PROJECTS.filter(p =>
+    (!state.topics.size || state.topics.has(p.topic)) &&
+    (!state.levels.size || state.levels.has(String(p.lv))) &&
+    (!state.savedOnly || state.saved.has(p.id)) &&
+    (!q || (p.t + " " + p.d + " " + p.mat.join(" ")).toLowerCase().includes(q))
+  );
+}
+
+function renderGrid() {
+  const list = filtered();
+  const parts = [];
+  if (state.savedOnly) parts.push("your picks");
+  else if (state.topics.size) parts.push([...state.topics].map(id => TOPIC[id].name).join(", "));
+  else parts.push("all topics");
+  const any = state.topics.size || state.levels.size || state.q || state.savedOnly;
+  $("#count").innerHTML = `Showing ${list.length} project${list.length === 1 ? "" : "s"} from ${esc(parts[0])}` +
+    (any ? ` <button class="clear" type="button" id="clearAll">Show everything</button>` : "");
+  $("#grid").innerHTML = list.length ? list.map(p => {
+    const t = TOPIC[p.topic];
+    return `<button class="card" type="button" data-id="${p.id}" style="--c:${t.color}">
+      <span class="top"><span>${t.icon} ${t.name}</span></span>
+      <span class="inner">
+        <h3>${esc(p.t)}</h3>
+        <p>${esc(p.d)}</p>
+        <span class="meta"><span class="pill lv${p.lv}">${LEVEL[p.lv]}</span><span class="pill">⏱ ${esc(p.time)}</span>
+        ${state.saved.has(p.id) ? '<span class="star" aria-label="In my picks">★</span>' : ""}</span>
+      </span></button>`;
+  }).join("") : `<div class="empty">${state.savedOnly ? "No picks yet. Open a project and tap ★ Save to my picks." : "No projects match. Try another word or topic."}</div>`;
+  $("#savedCount").textContent = state.saved.size;
+  $("#savedBtn").classList.toggle("saved-on", state.savedOnly);
+  $("#savedBtn").setAttribute("aria-pressed", state.savedOnly);
+}
+
+let current = null, lastFocus = null;
+function openProject(id, showMats = false) {
+  const p = PROJECTS.find(x => x.id === id); if (!p) return;
+  const t = TOPIC[p.topic];
+  current = p;
+  const checks = state.checks[p.id] || [];
+  const saved = state.saved.has(p.id);
+  $("#sheet").style.setProperty("--c", t.color);
+  $("#sheet").innerHTML = `
+    <div class="head">
+      <div class="kicker">${t.icon} ${t.name}</div>
+      <h2 id="dTitle">${esc(p.t)}</h2>
+      <button class="x" type="button" id="close" aria-label="Close">✕</button>
+    </div>
+    <div class="body">
+      <p class="idea">${esc(p.d)}</p>
+      <div class="facts">
+        <div class="fact"><span>Difficulty</span><strong>${LEVEL[p.lv]}</strong></div>
+        <div class="fact"><span>Time needed</span><strong>${esc(p.time)}</strong></div>
+        <div class="fact"><span>Materials</span><strong>${p.mat.length} items</strong></div>
+      </div>
+      ${showMats ? `
+      <div class="box">
+        <h4>🧰 Base materials</h4>
+        <ul class="mats">${p.mat.map((m, i) => `<li><label><input type="checkbox" id="m-${p.id}-${i}" data-i="${i}" ${checks.includes(i) ? "checked" : ""}><span>${esc(m)}</span></label></li>`).join("")}</ul>
+        <p class="note">Check off what you already have at home. You can add more materials once you plan your experiment.</p>
+      </div>
+      ${p.safe ? `<div class="box safety"><h4>⚠️ Safety first</h4><div>${esc(p.safe)}</div></div>` : ""}
+      ` : `<button class="reveal" type="button" id="reveal">🧰 Show what I'll need</button>`}
+      <div class="actions">
+        <button class="btn ${saved ? "saved-on" : ""}" type="button" id="save">${saved ? "★ Saved to my picks" : "☆ Save to my picks"}</button>
+        <button class="btn" type="button" id="another">Show me another ${t.name} idea</button>
+      </div>
+    </div>`;
+  if ($("#overlay").hidden) lastFocus = document.activeElement;
+  $("#overlay").hidden = false;
+  document.body.style.overflow = "hidden";
+  $("#close").focus();
+}
+function closeProject() {
+  $("#overlay").hidden = true; document.body.style.overflow = ""; current = null;
+  renderGrid();
+  if (lastFocus && document.body.contains(lastFocus)) lastFocus.focus();
+}
+
+// Events
+$("#topics").addEventListener("click", e => {
+  const b = e.target.closest(".topic"); if (!b) return;
+  const id = b.dataset.topic;
+  state.topics.has(id) ? state.topics.delete(id) : state.topics.add(id);
+  state.savedOnly = false;
+  store.set("sfi-topics", [...state.topics]);
+  b.setAttribute("aria-pressed", state.topics.has(id));
+  renderGrid();
+});
+$("#levels").addEventListener("click", e => {
+  const b = e.target.closest(".chip"); if (!b) return;
+  const lv = b.dataset.lv;
+  state.levels.has(lv) ? state.levels.delete(lv) : state.levels.add(lv);
+  b.setAttribute("aria-pressed", state.levels.has(lv));
+  renderGrid();
+});
+$("#q").addEventListener("input", e => { state.q = e.target.value; renderGrid(); });
+$("#count").addEventListener("click", e => {
+  if (e.target.id !== "clearAll") return;
+  state.topics.clear(); state.levels.clear(); state.q = ""; state.savedOnly = false;
+  $("#q").value = ""; store.set("sfi-topics", []);
+  document.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", "false"));
+  renderTopics(); renderGrid();
+});
+$("#grid").addEventListener("click", e => { const c = e.target.closest(".card"); if (c) openProject(c.dataset.id); });
+$("#savedBtn").addEventListener("click", () => { state.savedOnly = !state.savedOnly; renderGrid(); });
+$("#surprise").addEventListener("click", () => {
+  const pool = filtered().length ? filtered() : PROJECTS;
+  openProject(pool[Math.floor(Math.random() * pool.length)].id);
+});
+$("#overlay").addEventListener("click", e => {
+  if (e.target.id === "overlay" || e.target.closest("#close")) return closeProject();
+  if (!current) return;
+  if (e.target.closest("#reveal")) { openProject(current.id, true); $(".mats input")?.focus(); return; }
+  if (e.target.closest("#save")) {
+    state.saved.has(current.id) ? state.saved.delete(current.id) : state.saved.add(current.id);
+    store.set("sfi-saved", [...state.saved]);
+    const b = $("#save"), on = state.saved.has(current.id);
+    b.classList.toggle("saved-on", on); b.textContent = on ? "★ Saved to my picks" : "☆ Save to my picks";
+    $("#savedCount").textContent = state.saved.size;
+    return;
+  }
+  if (e.target.closest("#another")) {
+    const same = PROJECTS.filter(p => p.topic === current.topic && p.id !== current.id);
+    openProject(same[Math.floor(Math.random() * same.length)].id);
+  }
+});
+$("#overlay").addEventListener("change", e => {
+  if (!current || !e.target.matches(".mats input")) return;
+  const i = Number(e.target.dataset.i);
+  const set = new Set(state.checks[current.id] || []);
+  e.target.checked ? set.add(i) : set.delete(i);
+  state.checks[current.id] = [...set];
+  store.set("sfi-checks", state.checks);
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#overlay").hidden) closeProject(); });
+
+renderTopics();
+renderGrid();
+</script>
+</body>
+</html>
