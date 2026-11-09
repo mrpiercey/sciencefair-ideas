@@ -22,6 +22,7 @@
 
   --plants: #2fb35a;  --animals: #ff8a1f; --body-c: #ff4f8b; --kitchen: #9b5cff; --weather: #1e9bff;
   --motion: #ff4747;  --electric: #f5b800; --light: #10b8a6;  --earth: #8a5a3c;   --build: #4a63ff;
+  --taste: #8ac926;   --on-dark: #1d1f3b;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -88,8 +89,8 @@ h1 .c1 { color: var(--motion); } h1 .c2 { color: var(--electric); } h1 .c3 { col
 .topic .ico { font-size: 2.1rem; line-height: 1; width: 52px; height: 52px; display: grid; place-items: center; border-radius: 16px; background: color-mix(in srgb, var(--c) 18%, transparent); flex: none; }
 .topic .nm { font-family: var(--display); font-weight: 600; font-size: 1.12rem; line-height: 1.15; }
 .topic .ct { display: block; font-size: .85rem; color: var(--ink-soft); font-weight: 700; margin-top: 2px; }
-.topic[aria-pressed="true"] { background: var(--c); color: #fff; }
-.topic[aria-pressed="true"] .ct { color: #fff; opacity: .9; }
+.topic[aria-pressed="true"] { background: var(--c); color: var(--on, #fff); }
+.topic[aria-pressed="true"] .ct { color: var(--on, #fff); opacity: .9; }
 .topic[aria-pressed="true"] .ico { background: rgba(255,255,255,.25); }
 .topic[aria-pressed="true"]::after {
   content: "✓"; position: absolute; top: -10px; right: -10px; width: 30px; height: 30px; border-radius: 50%;
@@ -119,7 +120,7 @@ h1 .c1 { color: var(--motion); } h1 .c2 { color: var(--electric); } h1 .c3 { col
   transition: transform .12s, border-color .12s;
 }
 .card:hover { transform: translateY(-4px) rotate(-.4deg); border-color: var(--c); }
-.card .top { background: var(--c); color: #fff; padding: 8px 14px; display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: .85rem; letter-spacing: .4px; text-transform: uppercase; }
+.card .top { background: var(--c); color: var(--on, #fff); padding: 8px 14px; display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: .85rem; letter-spacing: .4px; text-transform: uppercase; }
 .card .inner { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
 .card h3 { font-family: var(--display); font-weight: 600; font-size: 1.3rem; line-height: 1.2; margin: 0; text-wrap: balance; }
 .card p { margin: 0; color: var(--ink-soft); font-size: 1rem; }
@@ -139,10 +140,10 @@ h1 .c1 { color: var(--motion); } h1 .c2 { color: var(--electric); } h1 .c3 { col
   max-height: calc(100% - 20px); overflow: auto; box-shadow: 0 10px 0 var(--c); animation: pop .22s ease-out;
 }
 @keyframes pop { from { transform: scale(.94); opacity: .4; } to { transform: none; opacity: 1; } }
-.sheet .head { background: var(--c); color: #fff; padding: 18px 22px 20px; position: relative; }
+.sheet .head { background: var(--c); color: var(--on, #fff); padding: 18px 22px 20px; position: relative; }
 .sheet .kicker { font-weight: 800; text-transform: uppercase; letter-spacing: .6px; font-size: .85rem; opacity: .95; }
 .sheet h2 { font-family: var(--display); font-weight: 700; font-size: clamp(1.7rem, 4vw, 2.4rem); line-height: 1.1; margin: 4px 50px 0 0; text-wrap: balance; }
-.x { position: absolute; top: 14px; right: 14px; width: 44px; height: 44px; border-radius: 50%; border: 3px solid #fff; background: rgba(255,255,255,.2); color: #fff; font-size: 1.4rem; font-weight: 800; line-height: 1; }
+.x { position: absolute; top: 14px; right: 14px; width: 44px; height: 44px; border-radius: 50%; border: 3px solid var(--on, #fff); background: rgba(255,255,255,.2); color: var(--on, #fff); font-size: 1.4rem; font-weight: 800; line-height: 1; }
 .sheet .body { padding: 20px 22px 24px; display: grid; gap: 18px; }
 .idea { font-size: 1.2rem; font-weight: 700; margin: 0; max-width: 62ch; }
 .facts { display: flex; flex-wrap: wrap; gap: 10px; }
@@ -187,7 +188,7 @@ h1 .c1 { color: var(--motion); } h1 .c2 { color: var(--electric); } h1 .c3 { col
       </svg>
       <div>
         <h1><span class="c1">Science</span> <span class="c2">Fair</span> <span class="c3">Idea</span> <span class="c4">Lab</span></h1>
-        <p class="tag">250 project ideas for 4th and 5th grade scientists</p>
+        <p class="tag">500 project ideas for 4th and 5th grade scientists</p>
       </div>
     </div>
     <div class="tools">
@@ -227,15 +228,21 @@ const TOPICS = [
   { id: "kitchen",  name: "Kitchen Chemistry",     icon: "🧪", color: "var(--kitchen)" },
   { id: "weather",  name: "Water & Weather",       icon: "🌧️", color: "var(--weather)" },
   { id: "motion",   name: "Forces & Motion",       icon: "🚀", color: "var(--motion)" },
-  { id: "electric", name: "Magnets & Electricity", icon: "🧲", color: "var(--electric)" },
+  { id: "electric", name: "Magnets & Electricity", icon: "🧲", color: "var(--electric)", on: "var(--on-dark)" },
   { id: "light",    name: "Light & Sound",         icon: "🔦", color: "var(--light)" },
   { id: "earth",    name: "Earth & Space",         icon: "🌎", color: "var(--earth)" },
-  { id: "build",    name: "Build It!",             icon: "🛠️", color: "var(--build)" }
+  { id: "build",    name: "Build It!",             icon: "🛠️", color: "var(--build)" },
+  { id: "taste",    name: "Taste & Brand Tests", icon: "🥤", color: "var(--taste)", on: "var(--on-dark)" }
 ];
+TOPICS.forEach(t => { t.style = `--c:${t.color}` + (t.on ? `;--on:${t.on}` : ""); });
 const TOPIC = Object.fromEntries(TOPICS.map(t => [t.id, t]));
 const PROJECTS = [];
+const topicCount = {};
 function addProjects(topic, list) {
-  list.forEach((p, i) => PROJECTS.push({ ...p, topic, id: topic + "-" + (i + 1) }));
+  list.forEach(p => {
+    topicCount[topic] = (topicCount[topic] || 0) + 1;
+    PROJECTS.push({ ...p, topic, id: topic + "-" + topicCount[topic] });
+  });
 }
 </script>
 <script src="data/p1-plants-animals.js"></script>
@@ -243,6 +250,10 @@ function addProjects(topic, list) {
 <script src="data/p3-weather-motion.js"></script>
 <script src="data/p4-electric-light.js"></script>
 <script src="data/p5-earth-build.js"></script>
+<script src="data/p6-taste-tests.js"></script>
+<script src="data/p7-more-plants-animals-body.js"></script>
+<script src="data/p8-more-kitchen-weather-motion.js"></script>
+<script src="data/p9-more-electric-light-earth-build.js"></script>
 <script>
 const LEVEL = { 1: "Easy", 2: "Medium", 3: "Challenge" };
 const store = {
@@ -263,7 +274,7 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;",
 function renderTopics() {
   $("#topics").innerHTML = TOPICS.map(t => {
     const n = PROJECTS.filter(p => p.topic === t.id).length;
-    return `<button class="topic" type="button" data-topic="${t.id}" style="--c:${t.color}" aria-pressed="${state.topics.has(t.id)}">
+    return `<button class="topic" type="button" data-topic="${t.id}" style="${t.style}" aria-pressed="${state.topics.has(t.id)}">
       <span class="ico" aria-hidden="true">${t.icon}</span>
       <span><span class="nm">${t.name}</span><span class="ct">${n} projects</span></span></button>`;
   }).join("");
@@ -290,7 +301,7 @@ function renderGrid() {
     (any ? ` <button class="clear" type="button" id="clearAll">Show everything</button>` : "");
   $("#grid").innerHTML = list.length ? list.map(p => {
     const t = TOPIC[p.topic];
-    return `<button class="card" type="button" data-id="${p.id}" style="--c:${t.color}">
+    return `<button class="card" type="button" data-id="${p.id}" style="${t.style}">
       <span class="top"><span>${t.icon} ${t.name}</span></span>
       <span class="inner">
         <h3>${esc(p.t)}</h3>
@@ -311,7 +322,7 @@ function openProject(id, showMats = false) {
   current = p;
   const checks = state.checks[p.id] || [];
   const saved = state.saved.has(p.id);
-  $("#sheet").style.setProperty("--c", t.color);
+  $("#sheet").setAttribute("style", t.style);
   $("#sheet").innerHTML = `
     <div class="head">
       <div class="kicker">${t.icon} ${t.name}</div>
