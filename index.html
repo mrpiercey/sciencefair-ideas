@@ -162,6 +162,17 @@ h1 .c1 { color: var(--motion); } h1 .c2 { color: var(--electric); } h1 .c3 { col
 .mats input { width: 22px; height: 22px; margin-top: 2px; accent-color: var(--c); flex: none; }
 .mats input:checked + span { text-decoration: line-through; color: var(--ink-soft); }
 .note { font-size: .95rem; color: var(--ink-soft); margin: 8px 0 0; }
+.qs { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.qpick {
+  width: 100%; text-align: left; border: 3px solid var(--line); background: var(--bg); border-radius: 14px;
+  padding: 10px 14px 10px 44px; font-weight: 700; font-size: 1.05rem; position: relative; transition: border-color .12s, transform .12s;
+}
+.qpick::before { content: "?"; position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 22px; height: 22px; border-radius: 50%; background: var(--c); color: var(--on, #fff); display: grid; place-items: center; font-family: var(--display); font-size: .9rem; }
+.qpick:hover { border-color: var(--c); transform: translateX(3px); }
+.qpick[aria-pressed="true"] { background: var(--c); color: var(--on, #fff); border-color: var(--c); }
+.qpick[aria-pressed="true"]::before { content: "✓"; background: var(--panel); color: var(--ink); }
+.qbox { border-color: var(--c); }
+.myq { font-weight: 800; font-size: .95rem; background: var(--bg); border: 2px dashed var(--c); border-radius: 12px; padding: 6px 10px; }
 .safety { border-color: #ffb3b3; background: color-mix(in srgb, #ff4747 8%, var(--panel)); }
 .actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; }
 
@@ -238,6 +249,8 @@ TOPICS.forEach(t => { t.style = `--c:${t.color}` + (t.on ? `;--on:${t.on}` : "")
 const TOPIC = Object.fromEntries(TOPICS.map(t => [t.id, t]));
 const PROJECTS = [];
 const topicCount = {};
+const QUESTIONS = {};
+function addQuestions(o) { Object.assign(QUESTIONS, o); }
 function addProjects(topic, list) {
   list.forEach(p => {
     topicCount[topic] = (topicCount[topic] || 0) + 1;
@@ -254,6 +267,12 @@ function addProjects(topic, list) {
 <script src="data/p7-more-plants-animals-body.js"></script>
 <script src="data/p8-more-kitchen-weather-motion.js"></script>
 <script src="data/p9-more-electric-light-earth-build.js"></script>
+<script src="data/questions-a.js"></script>
+<script src="data/questions-b.js"></script>
+<script src="data/questions-c.js"></script>
+<script src="data/questions-d.js"></script>
+<script src="data/questions-e.js"></script>
+<script src="data/questions-f.js"></script>
 <script>
 const LEVEL = { 1: "Easy", 2: "Medium", 3: "Challenge" };
 const store = {
@@ -266,7 +285,8 @@ const state = {
   q: "",
   savedOnly: false,
   saved: new Set(store.get("sfi-saved", [])),
-  checks: store.get("sfi-checks", {})
+  checks: store.get("sfi-checks", {}),
+  picks: store.get("sfi-picks", {})
 };
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -306,6 +326,7 @@ function renderGrid() {
       <span class="inner">
         <h3>${esc(p.t)}</h3>
         <p>${esc(p.d)}</p>
+        ${state.picks[p.id] !== undefined && QUESTIONS[p.id] ? `<span class="myq">💡 ${esc(QUESTIONS[p.id][state.picks[p.id]])}</span>` : ""}
         <span class="meta"><span class="pill lv${p.lv}">${LEVEL[p.lv]}</span><span class="pill">⏱ ${esc(p.time)}</span>
         ${state.saved.has(p.id) ? '<span class="star" aria-label="In my picks">★</span>' : ""}</span>
       </span></button>`;
@@ -316,10 +337,14 @@ function renderGrid() {
 }
 
 let current = null, lastFocus = null;
-function openProject(id, showMats = false) {
+let view = {};
+function openProject(id, v = {}) {
   const p = PROJECTS.find(x => x.id === id); if (!p) return;
   const t = TOPIC[p.topic];
-  current = p;
+  current = p; view = v;
+  const showMats = v.mats;
+  const qs = QUESTIONS[p.id] || [];
+  const pick = state.picks[p.id];
   const checks = state.checks[p.id] || [];
   const saved = state.saved.has(p.id);
   $("#sheet").setAttribute("style", t.style);
@@ -336,6 +361,12 @@ function openProject(id, showMats = false) {
         <div class="fact"><span>Time needed</span><strong>${esc(p.time)}</strong></div>
         <div class="fact"><span>Materials</span><strong>${p.mat.length} items</strong></div>
       </div>
+      ${qs.length ? (v.qs ? `
+      <div class="box qbox">
+        <h4>💡 Question ideas</h4>
+        <p class="note">Tap the question you want to explore. You can also change one into your own question.</p>
+        <ol class="qs">${qs.map((q, i) => `<li><button type="button" class="qpick" data-i="${i}" aria-pressed="${pick === i}">${esc(q)}</button></li>`).join("")}</ol>
+      </div>` : `<button class="reveal" type="button" id="revealQ">💡 Tap to see ${qs.length} question ideas</button>`) : ""}
       ${showMats ? `
       <div class="box">
         <h4>🧰 Base materials</h4>
@@ -394,7 +425,16 @@ $("#surprise").addEventListener("click", () => {
 $("#overlay").addEventListener("click", e => {
   if (e.target.id === "overlay" || e.target.closest("#close")) return closeProject();
   if (!current) return;
-  if (e.target.closest("#reveal")) { openProject(current.id, true); $(".mats input")?.focus(); return; }
+  if (e.target.closest("#reveal")) { openProject(current.id, { ...view, mats: true }); $(".mats input")?.focus(); return; }
+  if (e.target.closest("#revealQ")) { openProject(current.id, { ...view, qs: true }); $(".qpick")?.focus(); return; }
+  const qp = e.target.closest(".qpick");
+  if (qp) {
+    const i = Number(qp.dataset.i);
+    if (state.picks[current.id] === i) delete state.picks[current.id]; else state.picks[current.id] = i;
+    store.set("sfi-picks", state.picks);
+    document.querySelectorAll(".qpick").forEach(b => b.setAttribute("aria-pressed", String(state.picks[current.id] === Number(b.dataset.i))));
+    return;
+  }
   if (e.target.closest("#save")) {
     state.saved.has(current.id) ? state.saved.delete(current.id) : state.saved.add(current.id);
     store.set("sfi-saved", [...state.saved]);
